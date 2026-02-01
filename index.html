@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c5f2d">
+    <meta name="description" content="Pesticide Treatment Management PWA">
+    
+    <title>Vine Treatment Manager</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app">
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view active">
+            <header class="app-header">
+                <h1>🌿 Vine Treatments</h1>
+            </header>
+            
+            <main class="dashboard-content">
+                <!-- Notifications Section -->
+                <section id="notifications-section" class="notifications hidden">
+                    <div id="rotation-alerts" class="alert-container"></div>
+                    <div id="retreatment-alerts" class="alert-container"></div>
+                </section>
+                
+                <!-- Action Buttons -->
+                <section class="action-buttons">
+                    <button id="new-treatment-btn" class="btn btn-primary">
+                        <span class="btn-icon">➕</span>
+                        New Treatment
+                    </button>
+                    
+                    <button id="view-logs-btn" class="btn btn-secondary">
+                        <span class="btn-icon">📋</span>
+                        View Logs
+                    </button>
+                    
+                    <button id="export-btn" class="btn btn-secondary">
+                        <span class="btn-icon">📤</span>
+                        Export Data
+                    </button>
+                </section>
+                
+                <!-- Quick Stats -->
+                <section id="stats-section" class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Treatments</div>
+                        <div class="stat-value" id="total-treatments">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Last Treatment</div>
+                        <div class="stat-value" id="last-treatment">Never</div>
+                    </div>
+                </section>
+            </main>
+        </div>
+        
+        <!-- New Treatment View -->
+        <div id="new-treatment-view" class="view">
+            <header class="app-header">
+                <button class="back-btn" id="back-from-new">← Back</button>
+                <h1>New Treatment</h1>
+            </header>
+            
+            <main class="form-content">
+                <form id="treatment-form">
+                    <!-- Date/Time -->
+                    <div class="form-group">
+                        <label for="treatment-datetime">Date & Time</label>
+                        <input type="datetime-local" id="treatment-datetime" required>
+                    </div>
+                    
+                    <!-- Weather Section -->
+                    <div class="form-section">
+                        <h3>Weather Conditions</h3>
+                        <div id="weather-loading" class="loading-indicator hidden">Loading weather...</div>
+                        <div id="weather-data" class="weather-data hidden">
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <label for="temperature">Temperature (°F)</label>
+                                    <input type="number" id="temperature" step="0.1">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label for="humidity">Humidity (%)</label>
+                                    <input type="number" id="humidity" step="1" min="0" max="100">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <label for="wind-speed">Wind Speed (mph)</label>
+                                    <input type="number" id="wind-speed" step="0.1" min="0">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label for="weather-conditions">Conditions</label>
+                                    <input type="text" id="weather-conditions" placeholder="e.g., Clear">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chemical Selection -->
+                    <div class="form-section">
+                        <h3>Chemical Selection</h3>
+                        <div class="form-group">
+                            <label for="chemical-search">Add Chemical</label>
+                            <input type="text" id="chemical-search" placeholder="Search chemicals...">
+                            <div id="chemical-suggestions" class="suggestions-list hidden"></div>
+                        </div>
+                        
+                        <div id="selected-chemicals" class="selected-chemicals"></div>
+                        
+                        <!-- Compatibility Alert -->
+                        <div id="compatibility-alert" class="compatibility-alert hidden"></div>
+                    </div>
+                    
+                    <!-- Treatment Area -->
+                    <div class="form-section">
+                        <h3>Application Details</h3>
+                        <div class="form-group">
+                            <label for="treatment-area">Treatment Area (sq ft)</label>
+                            <input type="number" id="treatment-area" step="1" min="0" required>
+                        </div>
+                        
+                        <!-- Auto-calculated values -->
+                        <div id="calculated-values" class="calculated-values hidden">
+                            <div class="calc-item">
+                                <span class="calc-label">Finished Solution Volume:</span>
+                                <span class="calc-value" id="solution-volume">0 gal</span>
+                            </div>
+                            <div id="chemical-amounts"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Retreatment Interval -->
+                    <div class="form-section">
+                        <h3>Retreatment (Optional)</h3>
+                        <div class="form-group">
+                            <label for="retreatment-interval">Re-treat in (days)</label>
+                            <input type="number" id="retreatment-interval" step="1" min="0" placeholder="e.g., 7, 14, 21">
+                            <small>Leave blank if no retreatment needed</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes -->
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="treatment-notes">Notes (Optional)</label>
+                            <textarea id="treatment-notes" rows="3" placeholder="Any observations or special conditions..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-large">Submit Treatment</button>
+                    </div>
+                </form>
+            </main>
+        </div>
+        
+        <!-- Logs View -->
+        <div id="logs-view" class="view">
+            <header class="app-header">
+                <button class="back-btn" id="back-from-logs">← Back</button>
+                <h1>Treatment Logs</h1>
+            </header>
+            
+            <main class="logs-content">
+                <!-- Filters -->
+                <div class="filters-section">
+                    <input type="text" id="log-search" placeholder="Search by chemical or date...">
+                    <button id="clear-filters-btn" class="btn btn-small">Clear</button>
+                </div>
+                
+                <!-- Treatment List -->
+                <div id="treatments-list" class="treatments-list">
+                    <div class="empty-state">
+                        <p>No treatments recorded yet.</p>
+                        <p>Tap "New Treatment" to get started!</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+        <!-- Treatment Detail Modal -->
+        <div id="treatment-detail-modal" class="modal hidden">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h2>Treatment Details</h2>
+                    <button class="close-btn" id="close-detail-modal">✕</button>
+                </header>
+                <div class="modal-body" id="treatment-detail-content"></div>
+                <footer class="modal-footer">
+                    <button class="btn btn-danger" id="delete-treatment-btn">Delete</button>
+                    <button class="btn btn-secondary" id="close-detail-btn">Close</button>
+                </footer>
+            </div>
+        </div>
+        
+        <!-- Export Modal -->
+        <div id="export-modal" class="modal hidden">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h2>Export Data</h2>
+                    <button class="close-btn" id="close-export-modal">✕</button>
+                </header>
+                <div class="modal-body">
+                    <p>Choose export format:</p>
+                    <div class="export-options">
+                        <button class="btn btn-primary" id="export-csv-btn">📄 Export as CSV</button>
+                        <button class="btn btn-primary" id="export-json-btn">📋 Export as JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script type="module" src="src/app.js"></script>
+    
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>

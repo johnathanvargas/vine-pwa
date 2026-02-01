@@ -1,0 +1,20 @@
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Optional: if you add Node.js tooling later
+node_modules/
+package-lock.json
+yarn.lock
